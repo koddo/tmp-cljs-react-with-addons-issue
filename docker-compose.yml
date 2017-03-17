@@ -1,0 +1,45 @@
+# --project-name cljstest
+# project name is set in .env file
+
+version: '3'
+
+
+services:
+
+  figwheel:
+    build:
+      context: .
+      dockerfile: Dockerfile_figwheel
+    volumes:
+      - .:/home/theuser/theproject
+      - ./lein-deps:/home/theuser/.m2/      # cache dependencies of lein figwheel to avoid downloading them on every run, this is gitignored
+    working_dir: /home/theuser/theproject
+    command: lein figwheel
+    ports:
+      - "3449:3449"
+
+  gulp:
+    build:
+      context: .
+      dockerfile: Dockerfile_gulp
+    volumes:
+      - .:/home/node/theproject
+    working_dir: /home/node/theproject
+    command: gulp
+
+  flask-static:
+    build:
+      context: .
+      dockerfile: Dockerfile_flask
+    volumes:
+      - .:/home/theuser/theproject
+    working_dir: /home/theuser/theproject
+    command: bin/flask-static.py
+    ports:
+      - "3448:3448"
+
+  browser-console-logger:
+    image: koddo/browser-console-logger
+    ports:
+      - "9907:9907"
+
